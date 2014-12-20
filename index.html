@@ -1,92 +1,539 @@
-
 <!DOCTYPE html>
+
 <html>
-	<head>
-	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	    <title>EhrScape - Vnos in poizvedovanje po EHR podatkih</title>
-	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-	    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
-	    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-	    <script src="demo.js"></script>
-	    <style>
-	  		body {padding: 10px;}
-	  		.btn {margin-top: 10px;}
-	  		.obvestilo {margin-left:10px;}
-	  	</style>
-	</head>
-	<body>
-		<div class="page-header"><h2>Vnos in poizvedovanje po EHR podatkih <small>EhrScape platforma</small></h2></div>
-		<div class="row">
-			<div class="col-lg-6 col-md-6 col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-lg-8 col-md-8 col-sm-8"><b>Kreiraj EHR zapis</b> za novega bolnika</div>
-							<div class="col-lg-4 col-md-4 col-sm-4"><select class="form-control input-sm" id="preberiPredlogoBolnika"><option value=""></option><option value="Pujsa,Pepa,1938-10-30T14:58">Pujsa Pepa</option></select></div>
-						</div>
-					</div>
-					<div class="panel-body">
-						<span class="label label-default">Ime</span><input id="kreirajIme" type="text" class="form-control input-mini" placeholder="Osama">
-						<span class="label label-default">Priimek</span><input id="kreirajPriimek" type="text" class="form-control" placeholder="Bin Laden">
-						<span class="label label-default">Datum rojstva</span><input id="kreirajDatumRojstva" type="text" class="form-control" placeholder="1957-03-10T09:08">
-						<button type="button" class="btn btn-primary btn-xs" onclick="kreirajEHRzaBolnika()">Dodaj osnovne podatke o bolniku</button><span id="kreirajSporocilo"></span>
-				  	</div>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="dnal4.js"></script>
+<script type="text/javascript" src="d3.min.js"></script>
+<script type="text/javascript" src="radialProgress.js"></script>
+
+ 
+
+
+
+
+<style> body {
+	font-family: Century Gothic, sans-serif;
+	
+	 padding:30px;
+	
+}
+h1 { text-align: center;
+	padding: 10px;
+	  
+	font-weight: 500;
+	height: 50px;
+	color: #1E90FF;
+	
+	font-size: 200%;
+	
+	
+    
+	
+}
+
+		.background {
+		    fill: #FFFFFF;
+		}
+
+		.component {
+		    fill: #e1e1e1;
+		}
+
+		#div1 .component .label {
+		    font-family: Century Gothic, sans-serif;
+		    text-anchor: middle;
+		    fill: #0000FF;
+		}
+		#div2 .component .label {
+		    font-family: Century Gothic, sans-serif;
+		    text-anchor: middle;
+		    fill: #000000;
+		}
+		#div3 .component .label {
+		    font-family: Century Gothic, sans-serif;
+		    text-anchor: middle;
+		    fill: #000000;
+		}
+		#div4 .component .label {
+		    font-family: Century Gothic, sans-serif;
+		    text-anchor: middle;
+		    fill: #000000;
+		}
+		#div5 .component .label {
+		    font-family: Century Gothic, sans-serif;
+		    text-anchor: middle;
+		    fill: #000000;
+		}
+
+		#div1 .arc {
+		    stroke-weight:0.1;
+		    fill: #0066FF;
+		}
+		#div2 .arc {
+		    stroke-weight:0.1;
+		     fill: #C00000;
+		}
+		#div3 .arc {
+		    stroke-weight:0.1;
+		     fill: #99FFFF;
+		}
+		#div4 .arc {
+		    stroke-weight:0.1;
+		     fill: #33CCFF;
+		}
+		#div5 .arc {
+		    stroke-weight:0.1;
+		     fill: #3300FF;
+		}
+
+
+		.label {
+		    font-family:  Century Gothic, sans-serif;
+		    text-anchor: middle;
+		}
+
+        #div1 #div2 {
+            padding:30px;
+        }
+
+
+
+
+</style>
+
+<script language="JavaScript">
+     
+	    var div1=d3.select(document.getElementById('div1'));
+	    var napredek =0;
+	    	var krog2=0;
+	    	var krog3=0;
+	    	var krog4=0;
+	    	var krog5=0;
+	    	
+	     var div2=d3.select(document.getElementById('div2'));
+	     
+	     var div3=d3.select(document.getElementById('div3'));
+	    
+	     var div4=d3.select(document.getElementById('div4'));
+	    
+	     var div5=d3.select(document.getElementById('div5'));
+
+	     function ponastaviStart() {
+	    
+	     	krog2=0;
+	     	krog3=0;
+	     	krog4=0;
+	    	krog5=0;
+	     	
+	 		start2();
+	 		start3();
+	 		start4();
+	 		start5();
+	     }
+	     
+	    	function napredek25(){
+	    		if(napredek<25){napredek=25;}
+	    		start();
+	    		
+	    	}
+	    	function napredek50(){
+	    		if(napredek<50){napredek=50;}
+	    		start();
+	    	}
+	    	function napredek75(){
+	    		if(napredek<75){napredek=75;}
+	    		start();
+	    	}
+	    	function napredek100(){
+	    		if(napredek<100){napredek=100;}
+	    		start();
+	    	}
+	    	function obisciZdravnika(){
+
+	    		krog2=100;
+	    		start2();
+	    	}
+	    	function nevarnost88(){
+
+	    		krog2=88;
+	    		start2();
+	    	}
+	    	function nevarnost44(){
+
+	    		krog2=44;
+	    		start2();
+	    	}
+	    	function nezdravBmi(){
+	    		krog3=45;
+	    		krog4=45;
+	    		krog5=10;
+	    		start3();
+	    		start4();
+	    		start5();
+	    	}
+	    	function zdravBmi(){
+	    		krog3=33;
+	    		krog4=33;
+	    		krog5=33;
+	    		start3();
+	    		start4();
+	    		start5();
+	    	}
+
+
+	    function start() {
+
+
+	        var rp1 = radialProgress(document.getElementById('div1'))
+	                .label("NAPREDEK")
+	                .diameter(150)
+	                .value(napredek)
+	                .render();
+
+	          
+
+	        $( ".radial-svg" ).css( "width", "150px" );
+	        $( ".radial-svg" ).css( "height", "150px" );
+	    }
+	    function start2() {
+
+	        var rp1 = radialProgress(document.getElementById('div2'))
+	                .label("Nevarnost")
+	                .diameter(150)
+	                .value(krog2)
+	                .render();
+
+	          
+
+	        $( ".radial-svg" ).css( "width", "150px" );
+	        $( ".radial-svg" ).css( "height", "150px" );
+	    }
+	    function start3() {
+
+	        var rp1 = radialProgress(document.getElementById('div3'))
+	                .label("Prehrana")
+	                .diameter(150)
+	                .value(krog3)
+	                .render();
+
+	          
+
+	        $( ".radial-svg" ).css( "width", "150px" );
+	        $( ".radial-svg" ).css( "height", "150px" );
+	    }
+			function start4() {
+
+	        var rp1 = radialProgress(document.getElementById('div4'))
+	                .label("Trening")
+	                .diameter(150)
+	                .value(krog4)
+	                .render();
+
+	          
+
+	        $( ".radial-svg" ).css( "width", "150px" );
+	        $( ".radial-svg" ).css( "height", "150px" );
+	    }
+	    function start5() {
+
+	        var rp1 = radialProgress(document.getElementById('div5'))
+	                .label("Lenarjenje")
+	                .diameter(150)
+	                .value(krog5)
+	                .render();
+
+	          
+
+	        $( ".radial-svg" ).css( "width", "150px" );
+	        $( ".radial-svg" ).css( "height", "150px" );
+	    }
+
+
+
+	    
+	</script>
+</head>
+<body>
+	<div class ="panel panel-info"><h1>Dejavnost glede na telesno pripravljenost
+	</h1>
+	</div>
+	<br>
+	<br>
+
+	
+<div class="row">
+	<div class="col-xs-5 col-lg-5">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+	<p style="color:#00BFFF" class="lead"> Kreiraj EHR ID posameznika</p></div>
+	
+	<br>
+	<div class="panel-body"> <p><u>Osnovni podatki</u></p>
+	<div style="float: right;">
+	<select id="izberiOsebo">
+		<option value=""></option>
+		<option  value="Fisk,WIlson,1967-6-13T14:55">Fisk Wilson</option>
+		<option  value="Parker,Peter,1986-10-06T00:14">Parker Peter</option>
+		<option  value="Osborn,Norman,1959-4-22T09:29">Osborn Norman</option>
+	</select>
+	</div>
+	<br>
+	
+			<table class="table" style="font-family: ‘Arial Black’, Gadget, sans-serif;">
+				<thead><tr>
+					<th style="color:#0066FF">Priimek:
+					</th>
+					<th style="color:#0066FF">Ime:</th>
+					<th style="color:#0066FF">Datum rojstva:</th>
+				</tr>
+				</thead>
+				<tbody><tr>
+						<td><input  class="form-control" type="text" id="vnesiPriimek"></td>
+						<td><input  class="form-control" type="text" id="vnesiIme"></td>
+						<td><input  class="form-control" type="text" id="vnesiDatum" placeholder="1999-12-13T00:00"></td>
+					</tr>
+				</tbody>
+			</table>
+						<p style="color:#0066FF" style="font-family: ‘Arial Black’, Gadget, sans-serif;"><b>Spol:<b></p>
+			<label  class="checkbox-inline">
+			<input type="checkbox" id="chkBox1" onclick="toggle(this);" >M
+			</label>
+			<label class="checkbox-inline" style="margin-left:50px">
+				<input type="checkbox" id="chkBox2" onclick="toggle(this);">Ž
+			</label>
+			<script type="text/javascript"> 
+			var previousCheckId;
+			function toggle(chkBox) {
+         if (chkBox.checked) {
+              if (previousCheckId) {
+                   document.getElementById(previousCheckId).checked = false;
+              }
+              previousCheckId = chkBox.getAttribute('id');
+         }
+     }
+     </script>
+			<br>
+			<br>
+			<button type="button" class="btn btn-info" onclick="ustvariEHR()"> Vnesi</button>
+	<br>
+	<br>
+	
+	<br>
+		<label style="float:left;" >Izpis EHR ID:</label>
+			<span  id="EHRSporocilo"></span>
+		
+			
+			
+		</div>
+		<div align="center" id="div1"></div>
+		<br>
+	</div>
+</div>
+
+
+<div class="col-xs-6 col-lg-6 col-xs-offset-1 col-lg-offset-1">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<p style="color:#00BFFF" class="lead">Vnesi meritve vitalnih znakov</p>
 				</div>
+				<div class="panel-body">
+					<div style="float: right;">
+						<select id="izberiOsebo3">
+		<option value=""></option>
+		<option  value="79b13786-e3bc-42f6-a933-8bd73985338a,200,204,36.50,135,89,90.0,98,2014-12-12T14:13,Dr. Otto Gunther Octavius">Fisk Wilson</option>
+		<option  value="4e89719f-bcf6-4ecb-ae0c-3526a64b7a8b,178,76,36.50,118,75,70.0,99,2014-12-12T14:13,Dr. Otto Gunther Octavius">Parker Peter</option>
+		<option  value="509f7f2e-f0c9-4200-9550-e0143e3538db,180,84,39.00,116,78,80.0,100,2014-12-12T14:13,Dr. Otto Gunther Octavius">Osborn Norman</option>
+						</select>
+					</div>
+					<br>
+					<br>
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="EHRIDposameznika2" style="color:#0066FF">EHR ID:</label>
+							<div class="col-xs-7 col-lg-7">
+					<input class="form-control" type="text" id="EHRIDposameznika2">
+							</div>
+						</div>
+						<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="vpisiTVisina" style="color:#0066FF">Telesna višina:</label>
+							<div class="col-xs-7 col-lg-7">
+								<input class="form-control" type="text" id="vpisiTVisina" placeholder="cm">
+									</div>
+						</div>
+					<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="vpisiTTeza" style="color:#0066FF">Telesna teža:</label>
+					<div class="col-xs-7 col-lg-7">
+						<input class="form-control" type="text" id="vpisiTTeza" placeholder="kg">	</div>
+						</div>
+					<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="vpisiTemperaturo" style="color:#0066FF">Telesna temperatura:</label>
+					<div class="col-xs-7 col-lg-7">
+						<input class="form-control" type="text" id="vpisiTemperaturo" placeholder="C">	</div>
+						</div>
+					<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="vpisiSistolicniKT" style="color:#0066FF">Sistolični krvni tlak:</label><div class="col-xs-3 col-lg-3"><input class="form-control" type="text" id="vpisiSistolicniKT" placeholder="mm Hg">	</div><label class="col-xs-3 col-lg-3 control-label" for="vpisiDiastolicniKT" style="color:#0066FF">Diastolični krvni tlak:</label><div class="col-xs-3 col-lg-3"><input class="form-control" type="text" id="vpisiDiastolicniKT" placeholder="mm Hg"></div>
+						</div>
+					
+					
+						<div class="form-group">
+							<label class="col-xs-3 col-lg-3 control-label" for="vpisiSrcniU" style="color:#0066FF">Srčni utrip:</label>
+							 <div class="col-xs-3 col-lg-3">
+							 	<input class="form-control" type="text" id="vpisiSrcniU" placeholder="utrip/min">	</div>
+							 	<label class="col-xs-3 col-lg-3 control-label" for="vpisiNasicenost" style="color:#0066FF">Nasičenost krvi s kisikom:</label>
+							 	<div class="col-xs-3 col-lg-3">
+							 		<input class="form-control" type="text" id="vpisiNasicenost" placeholder="%"></div>
+							 	</div>
+
+							 	
+						<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="datumInU" style="color:#0066FF">Datum in ura:</label>
+					<div class="col-xs-7 col-lg-7">
+					<input class="form-control" type="text" id="datumInU" placeholder="2014-12-13T00:00">	
+					</div>
+						</div>
+						<div class="form-group">
+					<label class="col-xs-3 col-lg-3 control-label" for="merilec" style="color:#0066FF">Merilec:
+					</label>
+					<div class="col-xs-7 col-lg-7">
+					<input class="form-control" type="text" id="merilec" placeholder="Dr. Otto Gunther Octavius">	</div>
+						</div>
+						
+
+				</form>
+			<br>
+
+
+				<div class="row">
+					<div class="col-xs-3 col-lg-3">
+									<button type="button" class="btn btn-info center-block" onclick="vnesiMVZ()">Vnesi meritve</button>
+					</div>
+
+								<div class="col-xs-6 col-lg-6">
+									<div class="panel panel-info">
+										<div class="panel-heading">
+											<span id="vneseneMVZ">
+											</span>
+										</div>
+								
+									</div>
+								</div>
+					
+				</div>
+			
+
+
+				</div>
+			
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-5 col-lg-5"> 
+		<div class= "panel panel-info">
+			<div class="panel-heading"> 
+					<p style="color:#00BFFF" class="lead">Preberi Osnovne Podatke</p>
 			</div>
-			<div class="col-lg-6 col-md-6 col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-lg-8 col-md-8 col-sm-8"><b>Preberi EHR zapis</b> obstoječega bolnika</div>
-							<div class="col-lg-4 col-md-4 col-sm-4"><select class="form-control input-sm" id="preberiObstojeciEHR"><option value=""></option><option value="254f791d-2e7c-49d9-b646-376f62d6ead5">Dejan Lavbič</option><option value="d564c6a3-5a43-4fcc-bfa7-9ac76e9673bd">Pujsa Pepa</option><option value="b931580f-2b05-488b-985b-8d9ffb08ad02">Ata Smrk</option></select></div>
-						</div>
-					</div>
-					<div class="panel-body">
-						<span class="label label-default">EHR ID</span><input id="preberiEHRid" type="text" class="form-control input-mini" placeholder="7b661e12-3a98-21ad-c29e-2dc9f5a3d885">
-						<button type="button" class="btn btn-primary btn-xs" onclick="preberiEHRodBolnika()">Preberi osnovne podatke o bolniku</button><span id="preberiSporocilo"></span>
-				  	</div>
-				</div>
+			<div class="panel-body">
+			<div style="float: right;">
+	<select id="izberiOsebo2">
+		<option value=""></option>
+		<option  value="79b13786-e3bc-42f6-a933-8bd73985338a">Fisk Wilson</option>
+		<option  value="4e89719f-bcf6-4ecb-ae0c-3526a64b7a8b">Parker Peter</option>
+		<option  value="509f7f2e-f0c9-4200-9550-e0143e3538db">Osborn Norman</option>
+	</select>
+	</div>
+	<br>
+	<span class="label label-primary">EHR ID:
+	</span><input class="form-control" type="text" id="EHRIDposameznika1">
+	<br>
+	<button type="button" class="btn btn-info" onclick="vrniOSP()"> Preberi</button>
+	<br>
+	<br>
+	<div class="row">
+		<div class="col-xs-4 col-lg-4"><p>Izpis Osnovnih Podatkov:</p>
+	</div>
+	<div class="col-xs-7 col-lg-7">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<span id="OSPposameznika"></span>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-lg-6 col-md-6 col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-lg-8 col-md-8 col-sm-8"><b>Vnos</b> meritve <b>vitalnih znakov</b> bolnika</div>
-							<div class="col-lg-4 col-md-4 col-sm-4"><select class="form-control input-sm" id="preberiObstojeciVitalniZnak"><option value=""></option><option value="b931580f-2b05-488b-985b-8d9ffb08ad02|2014-11-21T11:40Z|185|80.0|36.50|118|92|98|medicinska sestra Smrketa">Ata Smrk</option></select></div>
-						</div>
-					</div>				
-					<div class="panel-body">
-						<span class="label label-default">EHR ID</span><input id="dodajVitalnoEHR" type="text" class="form-control input-mini" placeholder="7b661e12-3a98-21ad-c29e-2dc9f5a3d885">
-						<span class="label label-default">Datum in ura</span><input id="dodajVitalnoDatumInUra" type="text" class="form-control input-mini" placeholder="2014-11-21T11:40Z">
-						<span class="label label-default">Telesna višina</span><div class="input-group"><input id="dodajVitalnoTelesnaVisina" type="text" class="form-control input-mini" placeholder="185"><span class="input-group-addon">cm</span></div>
-						<span class="label label-default">Telesna teža</span><div class="input-group"><input id="dodajVitalnoTelesnaTeza" type="text" class="form-control input-mini" placeholder="80.00"><span class="input-group-addon">kg</span></div>
-						<span class="label label-default">Telesna temperatura</span><div class="input-group"><input id="dodajVitalnoTelesnaTemperatura" type="text" class="form-control input-mini" placeholder="36.50"><span class="input-group-addon">°C</span></div>
-						<span class="label label-default">Sistolični krvni tlak</span><div class="input-group"><input id="dodajVitalnoKrvniTlakSistolicni" type="text" class="form-control input-mini" placeholder="118"><span class="input-group-addon">mm Hg</span></div>
-						<span class="label label-default">Diastolični krvni tlak</span><div class="input-group"><input id="dodajVitalnoKrvniTlakDiastolicni" type="text" class="form-control input-mini" placeholder="92"><span class="input-group-addon">mm Hg</span></div>
-						<span class="label label-default">Nasičenost krvi s kisikom</span><div class="input-group"><input id="dodajVitalnoNasicenostKrviSKisikom" type="text" class="form-control input-mini" placeholder="98"><span class="input-group-addon">%</span></div>
-						<span class="label label-default">Merilec</span><input id="dodajVitalnoMerilec" type="text" class="form-control input-mini" placeholder="medicinska sestra Hrastova Micka">
-						<button type="button" class="btn btn-primary btn-xs" onclick="dodajMeritveVitalnihZnakov()">Dodaj meritve vitalnih znakov</button><span id="dodajMeritveVitalnihZnakovSporocilo"></span>
-				  	</div>
-				</div>
-			</div>	
-			<div class="col-lg-6 col-md-6 col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-lg-6 col-md-6 col-sm-6"><b>Pregled</b> meritev <b>vitalnih znakov</b> bolnika</div>
-							<div class="col-lg-3 col-md-3 col-sm-3"><select class="form-control input-sm" id="preberiTipZaVitalneZnake"><option value="telesna temperatura">telesna temperatura</option><option value="telesna temperatura AQL">telesna temperatura (filter na podhladitev)</option><option value="telesna teža">telesna teža</option></select></div>
-							<div class="col-lg-3 col-md-3 col-sm-3"><select class="form-control input-sm" id="preberiEhrIdZaVitalneZnake"><option value=""></option><option value="b931580f-2b05-488b-985b-8d9ffb08ad02">Ata Smrk</option><option value="d564c6a3-5a43-4fcc-bfa7-9ac76e9673bd">Pujsa Pepa</option></select></div>
-						</div>
-					</div>				
-					<div class="panel-body">
-						<span class="label label-default">EHR ID</span><input id="meritveVitalnihZnakovEHRid" type="text" class="form-control input-mini" placeholder="7b661e12-3a98-21ad-c29e-2dc9f5a3d885">
-						<button type="button" class="btn btn-primary btn-xs" onclick="preberiMeritveVitalnihZnakov('telesna temperatura')">Preberi meritve vitalnih znakov</button><span id="preberiMeritveVitalnihZnakovSporocilo"></span>
-						<div id="rezultatMeritveVitalnihZnakov"></div>
-				  	</div>
-				</div>			
-			</div>
+	</div>
+</div>
+</div>
 		</div>
-	</body>
+	</div>
+	<div class="col-xs-6 col-lg-6 col-xs-offset-1 col-lg-offset-1">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<p style="color:#00BFFF" class="lead">Pregled meritev in napoved</p>
+			</div>
+
+				<div class="panel-body">
+
+					<div style="float: right;">
+						<select id="izberiOsebo4">
+		<option value=""></option>
+		<option  value="79b13786-e3bc-42f6-a933-8bd73985338a">Fisk Wilson</option>
+		<option  value="4e89719f-bcf6-4ecb-ae0c-3526a64b7a8b">Parker Peter</option>
+		<option  value="509f7f2e-f0c9-4200-9550-e0143e3538db">Osborn Norman</option>
+	</select>
+					</div>
+										<br>
+	<span class="label label-primary">EHR ID:
+	</span><input class="form-control" type="text" id="EHRIDposameznika3">
+	<br>
+	<button type="button" class="btn btn-info" onclick="vrniNapoved()"> Preglej</button>
+	<br>
+	<br>
+	<span id="napovedSporocilo2"></span>
+	<span id="napovedSporocilo">
+	</span>
+	<div id="rezultatNapoved"></div>
+			
+				</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="panel panel-info">
+		<div class="panel-body">
+			<span id="napovedSporocilo3"></span>
+			<div class= "col-xs-3 col-lg-3"><div id="div2"></div><!-- krog 1-->
+			<br>
+			<div id="rezultatNapoved2"></div>
+		</div>
+			<div class="col-xs-3 col-lg-3"><div id="div3"></div><!--krog 2 -->
+			<br>
+			<div id="rezultatNapoved3"></div>
+			<div id="prehranaTekst"></div>
+			<div id="prehranaLinki"></div>
+		</div>
+			<div class="col-xs-3 col-lg-3"><div id="div4"></div><!--krog 3 -->
+			<br>
+			<div id="treningTekst"></div>
+			<div id="prehranaLinki2"></div>
+		</div>
+			<div class="col-xs-3 col-lg-3"><div id="div5"></div><!---krog 4-->
+			<br>
+			<div id="lenarjenjeTekst"></div>
+		</div>
+		
+		</div>
+	</div>
+</div>
+
+
+
+	
+</body>
+
+
 </html>
