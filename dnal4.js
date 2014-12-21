@@ -21,7 +21,8 @@ function getSessionId() {
 
 
 $(document).ready(function(){
-	console.log("hihi");
+	console.log("pagestarted");
+    
     start();
 	ponastaviStart();
 	$('#izberiOsebo').change(function(){
@@ -64,6 +65,7 @@ $(document).ready(function(){
 		$("#EHRIDposameznika3").val(tabela4);
             $("#EHRIDposameznika3").val(tabela4);
         $("#rezultatNapoved2").html("");
+        $("#napovedSporocilo2").html("");
         $("#napovedSporocilo3").html("");
         $("#rezultatNapoved3").html("");
         $("#prehranaTekst").html("");
@@ -514,7 +516,7 @@ function vrniNapoved() {
 
             if (vrstice6[j].bmi<18.5){
             // funkcije za itm18-
-                var prehranaDebeli = "<p> Prosimo <font color='#3300FF'>povečajte dnevni vnos kalorij</font>, saj resno ogrožate vaše zdravje</p><p onclick='vec()'><u>Več>></u></p>";
+                var prehranaDebeli = "<p> Prosimo <font color='#3300FF'>povečajte dnevni vnos kalorij</font>, saj resno ogrožate vaše zdravje. </p><p onclick='vec()'><u>Več>></u></p>";
               var treningDebeli= "<p> Vaš trening naj vsebuje predvsem vadbo osredotočeno na pridobivanje mišične mase. Priporočamo vadbo z utežmi 3-4x tedensko.</p><p onclick='vec2()'><u>Več>></u></p>";
                     if (vrstice6[j].bmi<17){
                         if (vrstice6[j].bmi<16){//huda nedohranjenost
@@ -668,13 +670,16 @@ function vrniNapoved() {
 
 
 function vec() {
-    var linki = "<p> <a href='http://www.fitday.com/'> Fitday.com </a></p>  <p> <a href='http://www.myfitnesspal.com/'> MyFitnessPal.com </a></p>";
+    var linki = "<p> <a href='http://www.fitday.com/'> Fitday.com </a></p>  <p> <a href='http://www.myfitnesspal.com/'> MyFitnessPal.com </a></p><p>Pomagajte si s tabelo hranilnih vrednosti</p><span class= 'glyphicon glyphicon-hand-down'> </span><span class= 'glyphicon glyphicon-hand-down'> </span><span class= 'glyphicon glyphicon-hand-down'> </span>";
     $("#prehranaLinki").append(linki);
+    
 }
 function vec2() {
     var linki2 ="<p> <a href='http://www.bodybuilding.com/fun/workout/programs.html'> Bodybuilding.com(mišična masa) </a></p><p> <a href='http://www.bodybuilding.com/fun/workout/cardio.html'> Bodybuilding.com(kardio vadba) </a></p>";
     $("#prehranaLinki2").append(linki2);
+
 }
+
 
 
 
